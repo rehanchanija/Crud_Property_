@@ -5,7 +5,12 @@ const { Step } = Steps;
 const { TextArea } = Input;
 
 const Resume = () => {
+  const [zoomed, setZoomed] = useState(false);
+  const [isAlternateTemplate, setIsAlternateTemplate] = useState(false);
+  const [backgroundColor, setBackgroundColor] = useState("#f0f0f0");
+  const [textColor, setTextColor] = useState("#000000");
   const [step, setStep] = useState(0);
+  const [selectedTemplate, setSelectedTemplate] = useState(1); // Track which template is selected
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -51,7 +56,14 @@ const Resume = () => {
   const prevStep = () => {
     setStep(step - 1);
   };
+  const handleChangeTemplate = () => {
+    setIsAlternateTemplate(!isAlternateTemplate);
+    // Add functionality for changing the template
+  };
 
+  const handlePreview = () => {
+    setZoomed(!zoomed); // Toggle zoom state
+  };
   return (
     <div style={{ padding: "20px" }}>
       <Row gutter={16}>
@@ -114,14 +126,7 @@ const Resume = () => {
                     onChange={handleChange}
                   />
                 </Form.Item>
-                <Form.Item label="Date of Birth">
-                  <DatePicker
-                    name="dateOfBirth"
-                    onChange={(date, dateString) =>
-                      setFormData({ ...formData, dateOfBirth: dateString })
-                    }
-                  />
-                </Form.Item>
+
                 <Button type="primary" onClick={nextStep}>
                   Next
                 </Button>
@@ -129,13 +134,6 @@ const Resume = () => {
             )}
             {step === 1 && (
               <div>
-                <Form.Item label="Occupation">
-                  <Input
-                    name="occupation"
-                    value={formData.occupation}
-                    onChange={handleChange}
-                  />
-                </Form.Item>
                 <Form.Item label="Employer">
                   <Input
                     name="employer"
@@ -290,166 +288,311 @@ const Resume = () => {
             )}
           </Form>
         </Col>
-        <Col span={12}>
+        <Col span={10}>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              marginBottom: "20px",
+            }}
+          >
+            <button
+              style={{
+                padding: "10px 20px",
+                backgroundColor: "#0073e6",
+                color: "#ffffff",
+                border: "none",
+                borderRadius: "4px",
+                cursor: "pointer",
+                fontSize: "14px",
+              }}
+              onClick={() =>
+                handleChangeTemplate(selectedTemplate === 1 ? 2 : 1)
+              }
+            >
+              Change Template
+            </button>
+            <button
+              style={{
+                padding: "10px 20px",
+                backgroundColor: "#52c41a",
+                color: "#ffffff",
+                border: "none",
+                borderRadius: "4px",
+                cursor: "pointer",
+                fontSize: "14px",
+              }}
+              onClick={handlePreview}
+            >
+              {zoomed ? "Exit Preview" : "Preview"}
+            </button>
+          </div>
+
+          {/* Color Pickers (Visible when changing template) */}
+          <div style={{ marginBottom: "20px" }}>
+            <label style={{ marginRight: "10px", fontWeight: "bold" }}>
+              Background Color:
+            </label>
+            <input
+              type="color"
+              value={backgroundColor}
+              onChange={(e) => setBackgroundColor(e.target.value)}
+              style={{
+                cursor: "pointer",
+                border: "none",
+                borderRadius: "4px",
+                padding: "5px",
+                marginRight: "20px",
+              }}
+            />
+          </div>
           <div
             style={{
               padding: "20px",
-              backgroundColor: "#f0f0f0",
+              backgroundColor: backgroundColor,
+              color: textColor,
               borderRadius: "8px",
+              transform: zoomed ? "scale(1.2)" : "scale(1)",
+              transformOrigin: "top center",
+              transition: "transform 0.3s ease-in-out",
             }}
           >
-            <h2 style={{ color: "#1890ff", fontWeight: "bold" }}>
-              {formData.firstName} {formData.lastName}
-            </h2>
-            <div style={{ display: "flex", justifyContent: "space-between" }}>
+            {isAlternateTemplate ? (
               <div
                 style={{
-                  width: "50%",
+                  padding: "20px",
+                  backgroundColor: "#ffffff",
+                  borderRadius: "8px",
+                  boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
+                  fontFamily: "Arial, sans-serif",
+                  color: textColor,
                 }}
               >
-                <p>
-                  <strong style={{ color: "#1890ff" }}>Email:</strong>{" "}
-                  {formData.email}
+                {/* Name and Contact Info */}
+                <h1
+                  style={{
+                    fontSize: "24px",
+                    fontWeight: "bold",
+                    color: "#333",
+                  }}
+                >
+                  {formData.firstName} {formData.lastName}
+                </h1>
+                <p style={{ fontSize: "14px", color: "#555" }}>
+                  {formData.email} | {formData.phone} | {formData.city},{" "}
+                  {formData.country} | {formData.pinCode}
                 </p>
-                <p>
-                  <strong style={{ color: "#1890ff" }}>Phone:</strong>{" "}
-                  {formData.phone}
-                </p>
-                <p>
-                  <strong style={{ color: "#1890ff" }}>City:</strong>{" "}
-                  {formData.city}
-                </p>
-                <p>
-                  <strong style={{ color: "#1890ff" }}>Country:</strong>{" "}
-                  {formData.country}
-                </p>
-                <p>
-                  <strong style={{ color: "#1890ff" }}>Pin Code:</strong>{" "}
-                  {formData.pinCode}
-                </p>
-                <p>
-                  <strong style={{ color: "#1890ff" }}>Date of Birth:</strong>{" "}
-                  {formData.dateOfBirth}
-                </p>
-              </div>
-              <div
-                style={{
-                  width: "50%",
-                }}
-              >
-                <h3 style={{ color: "#52c41a", fontWeight: "bold" }}>
-                  Occupation
-                </h3>
-                <p>
-                  <strong style={{ color: "#52c41a" }}>Occupation:</strong>{" "}
-                  {formData.occupation}
-                </p>
-                <p>
-                  <strong style={{ color: "#52c41a" }}>Employer:</strong>{" "}
-                  {formData.employer}
-                </p>
-                <p>
-                  <strong style={{ color: "#52c41a" }}>Description:</strong>{" "}
+
+                {/* Summary Section */}
+                <h2
+                  style={{
+                    fontSize: "18px",
+                    fontWeight: "bold",
+                    color: "#0073e6",
+                    marginTop: "20px",
+                  }}
+                >
+                  Summary
+                </h2>
+                <p style={{ fontSize: "14px", color: "#555" }}>
                   {formData.description}
                 </p>
-                <p>
-                  <strong style={{ color: "#52c41a" }}>Job Title:</strong>{" "}
-                  {formData.jobTitle}
-                </p>
-                <p>
-                  <strong style={{ color: "#52c41a" }}>
-                    Employee Employer:
-                  </strong>{" "}
-                  {formData.employeeEmployer}
-                </p>
-                <p>
-                  <strong style={{ color: "#52c41a" }}>Begin:</strong>{" "}
-                  {formData.begin}
-                </p>
-                <p>
-                  <strong style={{ color: "#52c41a" }}>End:</strong>{" "}
-                  {formData.end}
-                </p>
-                <p>
-                  <strong style={{ color: "#52c41a" }}>
-                    Employee Description:
-                  </strong>{" "}
-                  {formData.employeeDescription}
-                </p>
-              </div>
-            </div>
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                marginTop: "20px",
-              }}
-            >
-              <div
-                style={{
-                  width: "50%",
-                }}
-              >
-                <h3 style={{ color: "#faad14", fontWeight: "bold" }}>
+
+                {/* Experience Section */}
+                <h2
+                  style={{
+                    fontSize: "18px",
+                    fontWeight: "bold",
+                    color: "#0073e6",
+                    marginTop: "20px",
+                  }}
+                >
+                  Experience
+                </h2>
+                <div style={{ marginBottom: "10px" }}>
+                  <p
+                    style={{
+                      fontSize: "14px",
+                      fontWeight: "bold",
+                      color: "#333",
+                    }}
+                  >
+                    {formData.jobTitle} - {formData.employer}
+                  </p>
+                  <p style={{ fontSize: "14px", color: "#555" }}>
+                    {formData.begin} - {formData.end}
+                  </p>
+                  <p style={{ fontSize: "14px", color: "#555" }}>
+                    {formData.employeeDescription}
+                  </p>
+                </div>
+
+                {/* Education Section */}
+                <h2
+                  style={{
+                    fontSize: "18px",
+                    fontWeight: "bold",
+                    color: "#0073e6",
+                    marginTop: "20px",
+                  }}
+                >
                   Education
-                </h3>
-                <p>
-                  <strong style={{ color: "#faad14" }}>College:</strong>{" "}
-                  {formData.college}
-                </p>
-                <p>
-                  <strong style={{ color: "#faad14" }}>Degree:</strong>{" "}
-                  {formData.degree}
-                </p>
-                <p>
-                  <strong style={{ color: "#faad14" }}>Education Begin:</strong>{" "}
-                  {formData.educationBegin}
-                </p>
-                <p>
-                  <strong style={{ color: "#faad14" }}>Education End:</strong>{" "}
-                  {formData.educationEnd}
-                </p>
-                <p>
-                  <strong style={{ color: "#faad14" }}>
-                    Education Description:
-                  </strong>{" "}
-                  {formData.educationDescription}
-                </p>
+                </h2>
+                <div style={{ marginBottom: "10px" }}>
+                  <p
+                    style={{
+                      fontSize: "14px",
+                      fontWeight: "bold",
+                      color: "#333",
+                    }}
+                  >
+                    {formData.degree}, {formData.college}
+                  </p>
+                  <p style={{ fontSize: "14px", color: "#555" }}>
+                    {formData.educationBegin} - {formData.educationEnd}
+                  </p>
+                  <p style={{ fontSize: "14px", color: "#555" }}>
+                    {formData.educationDescription}
+                  </p>
+                </div>
+
+                {/* Skills and Languages Section */}
+                <h2
+                  style={{
+                    fontSize: "18px",
+                    fontWeight: "bold",
+                    color: "#0073e6",
+                    marginTop: "20px",
+                  }}
+                >
+                  Skills & Languages
+                </h2>
+                <div>
+                  <p style={{ fontSize: "14px", color: "#555" }}>
+                    <strong>Languages:</strong> {formData.language1},{" "}
+                    {formData.language2}, {formData.language3}
+                  </p>
+                  <p style={{ fontSize: "14px", color: "#555" }}>
+                    <strong>Skills:</strong> {formData.skill1},{" "}
+                    {formData.skill2}, {formData.skill3}
+                  </p>
+                </div>
               </div>
+            ) : (
               <div
                 style={{
-                  width: "50%",
+                  padding: "20px",
+                  backgroundColor: "#ffffff",
+                  borderRadius: "8px",
+                  boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
+                  fontFamily: "Arial, sans-serif",
                 }}
               >
-                <h3 style={{ color: "#eb2f96", fontWeight: "bold" }}>
-                  Skills and Languages
-                </h3>
-                <p>
-                  <strong style={{ color: "#eb2f96" }}>Language 1:</strong>{" "}
-                  {formData.language1}
+                <h1
+                  style={{
+                    fontSize: "22px",
+                    fontWeight: "bold",
+                    color: "#333",
+                    textAlign: "center",
+                  }}
+                >
+                  {formData.firstName} {formData.lastName}
+                </h1>
+                <p
+                  style={{
+                    fontSize: "14px",
+                    color: "#555",
+                    textAlign: "center",
+                  }}
+                >
+                  {formData.email} | {formData.phone} | {formData.city},{" "}
+                  {formData.country} | {formData.pinCode}
                 </p>
-                <p>
-                  <strong style={{ color: "#eb2f96" }}>Language 2:</strong>{" "}
-                  {formData.language2}
+                <hr style={{ margin: "10px 0", border: "1px solid #ccc" }} />
+                <h2
+                  style={{
+                    fontSize: "18px",
+                    fontWeight: "bold",
+                    color: "#0073e6",
+                  }}
+                >
+                  Professional Summary
+                </h2>
+                <p style={{ fontSize: "14px", color: "#555" }}>
+                  {formData.description}
                 </p>
-                <p>
-                  <strong style={{ color: "#eb2f96" }}>Language 3:</strong>{" "}
-                  {formData.language3}
-                </p>
-                <p>
-                  <strong style={{ color: "#eb2f96" }}>Skill 1:</strong>{" "}
-                  {formData.skill1}
-                </p>
-                <p>
-                  <strong style={{ color: "#eb2f96" }}>Skill 2:</strong>{" "}
-                  {formData.skill2}
-                </p>
-                <p>
-                  <strong style={{ color: "#eb2f96" }}>Skill 3:</strong>{" "}
-                  {formData.skill3}
-                </p>
+                <h2
+                  style={{
+                    fontSize: "18px",
+                    fontWeight: "bold",
+                    color: "#faad14",
+                  }}
+                >
+                  Skills
+                </h2>
+                <ul style={{ fontSize: "14px", color: "#555" }}>
+                  <li>{formData.language1}</li>
+                  <li>{formData.language2}</li>
+                  <li>{formData.skill1}</li>
+                  <li>{formData.skill2}</li>
+                  <li>{formData.skill3}</li>
+                </ul>
+                <h2
+                  style={{
+                    fontSize: "18px",
+                    fontWeight: "bold",
+                    color: "#0073e6",
+                    marginTop: "20px",
+                  }}
+                >
+                  Education
+                </h2>
+                <div style={{ marginBottom: "10px" }}>
+                  <p
+                    style={{
+                      fontSize: "14px",
+                      fontWeight: "bold",
+                      color: "#333",
+                    }}
+                  >
+                    {formData.degree}, {formData.college}
+                  </p>
+                  <p style={{ fontSize: "14px", color: "#555" }}>
+                    {formData.educationBegin} - {formData.educationEnd}
+                  </p>
+                  <p style={{ fontSize: "14px", color: "#555" }}>
+                    {formData.educationDescription}
+                  </p>
+                </div>
+                <div style={{ marginBottom: "10px" }}>
+                  <h2
+                    style={{
+                      fontSize: "18px",
+                      fontWeight: "bold",
+                      color: "#0073e6",
+                      marginTop: "20px",
+                    }}
+                  >
+                    Experience
+                  </h2>
+                  <p
+                    style={{
+                      fontSize: "14px",
+                      fontWeight: "bold",
+                      color: "#333",
+                    }}
+                  >
+                    {formData.jobTitle} - {formData.employer}
+                  </p>
+                  <p style={{ fontSize: "14px", color: "#555" }}>
+                    {formData.begin} - {formData.end}
+                  </p>
+                  <p style={{ fontSize: "14px", color: "#555" }}>
+                    {formData.employeeDescription}
+                  </p>
+                </div>
               </div>
-            </div>
+            )}
           </div>
         </Col>
       </Row>
