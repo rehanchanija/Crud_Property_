@@ -1,12 +1,20 @@
-import { Button, Form, Input, Layout, Menu, message } from "antd";
+import {
+  Button,
+  Form,
+  Input,
+  Layout,
+  Menu,
+  message,
+  Modal,
+  Select,
+} from "antd";
 import { useState } from "react";
 
 const { Sider, Content } = Layout;
 
-export default function VerticalBreadcrumbForm() {
-  const [currentStep, setCurrentStep] = useState("1"); // Track current step
+export default function ResumeBuilder() {
+  const [currentStep, setCurrentStep] = useState("1");
   const [formData, setFormData] = useState({
-    // Personal Details
     firstName: "",
     lastName: "",
     email: "",
@@ -16,30 +24,29 @@ export default function VerticalBreadcrumbForm() {
     pinCode: "",
     dateOfBirth: "",
     occupation: "",
-    // Professional Summary
     employer: "",
     description: "",
-    // Employee
     jobTitle: "",
     employeeEmployer: "",
     begin: "",
     end: "",
     employeeDescription: "",
-    // Education
     college: "",
     degree: "",
     educationBegin: "",
     educationEnd: "",
     educationDescription: "",
-    // Languages
     language1: "",
     language2: "",
     language3: "",
-    // Skills
     skill1: "",
     skill2: "",
     skill3: "",
   });
+
+  const [template, setTemplate] = useState("Template 1");
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [textColor, setTextColor] = useState("#000000");
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -51,9 +58,17 @@ export default function VerticalBreadcrumbForm() {
     message.success("Form submitted successfully!");
   };
 
+  const handleTemplateChange = (value) => {
+    setTemplate(value);
+  };
+
+  const handleColorChange = (e) => {
+    setTextColor(e.target.value);
+  };
+
   return (
     <Layout className="h-screen">
-      {/* Sidebar with Vertical Breadcrumb */}
+      {/* Sidebar with Steps */}
       <Sider width={200} className="bg-white">
         <Menu
           mode="vertical"
@@ -62,11 +77,11 @@ export default function VerticalBreadcrumbForm() {
           onClick={(e) => setCurrentStep(e.key)}
           style={{ height: "100%", borderRight: 0 }}
         >
-          <Menu.Item key="1"> Personal Details</Menu.Item>
+          <Menu.Item key="1">Personal Details</Menu.Item>
           <Menu.Item key="2">Professional Summary</Menu.Item>
           <Menu.Item key="3">Employee</Menu.Item>
           <Menu.Item key="4">Education</Menu.Item>
-          <Menu.Item key="5">Language</Menu.Item>
+          <Menu.Item key="5">Languages</Menu.Item>
           <Menu.Item key="6">Skills</Menu.Item>
         </Menu>
       </Sider>
@@ -344,7 +359,7 @@ export default function VerticalBreadcrumbForm() {
                 </Form>
               </>
             )}
-
+            {/* Add other form sections here */}
             <div className="flex justify-end mt-4">
               <Button
                 type="primary"
@@ -357,7 +372,6 @@ export default function VerticalBreadcrumbForm() {
               >
                 Previous
               </Button>
-
               {currentStep === "6" ? (
                 <Button type="primary" onClick={handleSubmit}>
                   Submit
@@ -378,17 +392,72 @@ export default function VerticalBreadcrumbForm() {
           </div>
 
           {/* Preview Section */}
-          <div className="w-1/3 p-4 ml-4 bg-gray-50 shadow rounded-md">
-            <h3 className="text-lg font-semibold mb-4">Preview</h3>
-            <div className="space-y-4">
-              <p>
-                <strong>First Name:</strong> {formData.firstName || "N/A"}
-              </p>
-              {/* Display all formData in Preview */}
-            </div>
+          <div
+            className="w-1/3 bg-white shadow-md rounded-md p-6 border border-gray-200"
+            style={{ color: textColor }}
+          >
+            <h2 className="text-2xl font-bold">
+              {formData.firstName || "Your Name"}
+            </h2>
+            <p className="text-gray-500">
+              {formData.email || "example@example.com"} |{" "}
+              {formData.phone || "N/A"} | {formData.city || "City"},{" "}
+              {formData.country || "Country"}
+            </p>
+            <hr className="my-4" />
+            <h3 className="text-lg font-semibold">Professional Summary</h3>
+            <p>{formData.description || "N/A"}</p>
+            <h3 className="text-lg font-semibold mt-4">Skills</h3>
+            <ul className="list-disc list-inside">
+              <li>{formData.skill1 || "N/A"}</li>
+              <li>{formData.skill2 || "N/A"}</li>
+              <li>{formData.skill3 || "N/A"}</li>
+            </ul>
+            {/* Add other sections here */}
           </div>
         </Content>
       </Layout>
+
+      {/* Template Modal */}
+      <Modal
+        title="Change Template"
+        visible={isModalVisible}
+        onCancel={() => setIsModalVisible(false)}
+        footer={null}
+      >
+        <div className="mb-4">
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Select Template:
+          </label>
+          <Select
+            defaultValue="Template 1"
+            className="w-full"
+            onChange={handleTemplateChange}
+          >
+            <Select.Option value="Template 1">Template 1</Select.Option>
+            <Select.Option value="Template 2">Template 2</Select.Option>
+            <Select.Option value="Template 3">Template 3</Select.Option>
+          </Select>
+        </div>
+        <div className="mb-4">
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Text Color:
+          </label>
+          <input
+            type="color"
+            value={textColor}
+            onChange={handleColorChange}
+            className="w-full border border-gray-300 rounded p-1"
+          />
+        </div>
+        <Button
+          type="primary"
+          className="w-full bg-blue-500 hover:bg-blue-600 text-white font-medium rounded py-2"
+          onClick={() => setIsModalVisible(false)}
+        >
+          Apply
+        </Button>
+      </Modal>
     </Layout>
   );
 }
